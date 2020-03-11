@@ -55,28 +55,6 @@ def _fix_connectivity(X, connectivity, affinity):
         else:
             connectivity = connectivity.tolil()
 
-    # Compute the number of nodes
-    n_connected_components, labels = connected_components(connectivity)
-
-    if n_connected_components > 1:
-        warnings.warn("the number of connected components of the "
-                      "connectivity matrix is %d > 1. Completing it to avoid "
-                      "stopping the tree early." % n_connected_components,
-                      stacklevel=2)
-        # XXX: Can we do without completing the matrix?
-        for i in range(n_connected_components):
-            idx_i = np.where(labels == i)[0]
-            Xi = X[idx_i]
-            for j in range(i):
-                idx_j = np.where(labels == j)[0]
-                Xj = X[idx_j]
-                D = pairwise_distances(Xi, Xj, metric=affinity)
-                ii, jj = np.where(D == np.min(D))
-                ii = ii[0]
-                jj = jj[0]
-                connectivity[idx_i[ii], idx_j[jj]] = True
-                connectivity[idx_j[jj], idx_i[ii]] = True
-
     return connectivity, n_connected_components
 
 
